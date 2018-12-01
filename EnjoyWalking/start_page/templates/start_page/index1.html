@@ -1,8 +1,11 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<meta name="viewport" content="initial-scale=1.0, width=device-width" />
-<link rel="stylesheet" type="text/css" href="https://js.api.here.com/v3/3.0/mapsjs-ui.css?dp-version=1542186754" />
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
 <script type="text/javascript" src="https://js.api.here.com/v3/3.0/mapsjs-core.js"></script>
 <script type="text/javascript" src="https://js.api.here.com/v3/3.0/mapsjs-service.js"></script>
 <script type="text/javascript" src="https://js.api.here.com/v3/3.0/mapsjs-ui.js"></script>
@@ -164,142 +167,87 @@
   <div id="map" style="position:absolute; width:100%; height:100%; background:grey" ></div>
 {#  <div id="panel" style="position:absolute; width:49%; left:51%; height:100%; background:inherit" ></div>#}
 
+ <div id="map" style="width: 100%; height: 400px; background: grey" />
   <script  type="text/javascript" charset="UTF-8" >
-// Instantiate a map and platform object:
+
+/**
+ * Moves the map to display over Berlin
+ *
+ * @param  {H.Map} map      A HERE Map instance within the application
+ */
+function moveMapToBerlin(map){
+  map.setCenter({lat:55.773842, lng:37.578098});
+  map.setZoom(14);
+}
+
+
+
+
+
+/**
+ * Boilerplate map initialization code starts below:
+ */
+
+//Step 1: initialize communication with the platform
 var platform = new H.service.Platform({
-  'app_id': 'teFX7Xo13b2kOkodOS0E',
-  'app_code': 'gTUGnrxh2I0peZbAHwfe2Q'
+  app_id: 'devportal-demo-20180625',
+  app_code: '9v2BkviRwi9Ot26kp2IysQ',
+  useHTTPS: true
 });
-// Retrieve the target element for the map:
-var targetElement = document.getElementById('mapContainer');
 
-// Get the default map types from the platform object:
-var defaultLayers = platform.createDefaultLayers();
+var count = 0;
+var first;
+var second;
 
-// Instantiate the map:
-var map = new H.Map(
-  document.getElementById('map'),
-  defaultLayers.normal.map,
-  {
-  zoom: 10,
-  center: { lat: 52.51, lng: 13.4 }
-  });
-var mapEvents = new H.mapevents.MapEvents(map);
-    var count = 0;
-    var first;
-    var second;
-// Add event listener:
-{#map.addEventListener('tap', function(evt) {#}
-{#  // Log 'tap' and 'mouse' events:#}
-{#        if(count == 2) {#}
-{#            return;#}
-{#        }#}
-{##}
-{#        var cords = map.screenToGeo(evt.currentPointer.viewportX,#}
-{#            evt.currentPointer.viewportY);#}
-{#        var endMarker = new H.map.Marker({#}
-{#            lat: cords.lat,#}
-{#            lng: cords.lng#}
-{#        });#}
-{#        count++;#}
-{##}
-{#        if(count == 2) {#}
-{##}
-{#        }#}
-{#    map.addObjects([endMarker]);#}
-{#});#}
-// Create the parameters for the routing request:
-var routingParameters = {
-  // The routing mode:
-  'mode': 'fastest;car',
-  // The start point of the route:
-    {% for p0 in points %}
-        waypoint{{p0.0}}: '{{ p0.1.0 }},{{ p0.1.1 }}',
-{% endfor %}
-  // To retrieve the shape of the route we choose the route
-  // representation mode 'display'
-  'representation': 'display'
-};
+var pixelRatio = window.devicePixelRatio || 1;
+var defaultLayers = platform.createDefaultLayers({
+  tileSize: pixelRatio === 1 ? 256 : 512,
+  ppi: pixelRatio === 1 ? undefined : 320
+});
 
-// Define a callback function to process the routing response:
-var onResult = function(result) {
-  var route,
-    routeShape,
-    startPoint,
-    endPoint,
-    linestring;
-  if(result.response.route) {
-  // Pick the first route from the response:
-  route = result.response.route[0];
-  // Pick the route's shape:
-  routeShape = route.shape;
+//Step 2: initialize a map  - not specificing a location will give a whole world view.
+var map = new H.Map(document.getElementById('map'),
+  defaultLayers.normal.map, {pixelRatio: pixelRatio});
+map.addEventListener('tap', function(evt) {
+  // Log 'tap' and 'mouse' events:
+        if(count == 2) {
+            return;
+        }
 
-  // Create a linestring to use as a point source for the route line
-  linestring = new H.geo.LineString();
-
-  // Push all the points in the shape into the linestring:
-  routeShape.forEach(function(point) {
-    var parts = point.split(',');
-    linestring.pushLatLngAlt(parts[0], parts[1]);
-  });
-
-  // Retrieve the mapped positions of the requested waypoints:
-  startPoint = route.waypoint[0].mappedPosition;
-  endPoint = route.waypoint[1].mappedPosition;
-
-  // Create a polyline to display the route:
-  var routeLine = new H.map.Polyline(linestring, {
-    style: { strokeColor: 'blue', lineWidth: 10 }
-  });
-
-  // Create a marker for the start point:
-  var startMarker = new H.map.Marker({
-    lat: startPoint.latitude,
-    lng: startPoint.longitude
-  });
-    var points = [
-        {% for p0 in points %}
-            [{{ p0.1.0 }}, {{ p0.1.1 }}],
-{% endfor %}
-    ];
-
-    for (var i = 0; i < points.length; i++) {
+        var cords = map.screenToGeo(evt.currentPointer.viewportX,
+            evt.currentPointer.viewportY);
         var endMarker = new H.map.Marker({
-            lat: points[i][0],
-            lng: points[i][1]
+            lat: cords.lat,
+            lng: cords.lng
         });
-         map.addObjects([endMarker]);
-        console.log(points[i][0]);
-        console.log(points[i][1]);
-    }
+        count++;
+        if (count == 1) {
+            first = cords;
+        }
+        if (count == 2) {
+            second = cords;
+        }
+        if(count == 2) {
 
+        }
+    map.addObjects([endMarker]);
+});
+//Step 3: make the map interactive
+// MapEvents enables the event system
+// Behavior implements default interactions for pan/zoom (also on mobile touch environments)
+var behavior = new H.mapevents.Behavior(new H.mapevents.MapEvents(map));
 
-  // Create a marker for the end point:
-  var endMarker = new H.map.Marker({
-    lat: endPoint.latitude,
-    lng: endPoint.longitude
-  });
+// Create the default UI components
+var ui = H.ui.UI.createDefault(map, defaultLayers);
 
-  // Add the route polyline and the two markers to the map:
-  map.addObjects([routeLine]);
-
-  // Set the map's viewport to make the whole route visible:
-  map.setViewBounds(routeLine.getBounds());
-  }
-};
-
-// Get an instance of the routing service:
-var router = platform.getRoutingService();
-
-// Call calculateRoute() with the routing parameters,
-// the callback and an error callback function (called if a
-// communication error occurs):
-router.calculateRoute(routingParameters, onResult,
-  function(error) {
-    alert(error.message);
-  });
+// Now use the map as required...
+moveMapToBerlin(map);
   </script>
-
-{{ points }}
+<form action="" method="post">
+    {% csrf_token %}
+{#    {{ form.as_p}}#}
+     {{ form.as_p}}
+    <input type="submit" value="Submit">
+</form>
 </body>
 </html>

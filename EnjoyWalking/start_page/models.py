@@ -14,9 +14,9 @@ class Point(models.Model):
 
 # Create your models here.
 class Points(models.Model):
-    latitude_a = models.CharField(max_length=100) # shirota
-    longtitude_a = models.CharField(max_length=100)# dolgota
-    latitude_b = models.CharField(max_length=100)  # shirota
-    longtitude_b = models.CharField(max_length=100)  # dolgota
+    latitude_a = models.CharField(max_length=100, default='55.7217974') # shirota
+    longtitude_a = models.CharField(max_length=100, default='37.6118358')# dolgota
+    latitude_b = models.CharField(max_length=100, default='55.8416519')  # shirota
+    longtitude_b = models.CharField(max_length=100, default='37.4626163')  # dolgota
     rating = models.FloatField()
     description = models.TextField()
