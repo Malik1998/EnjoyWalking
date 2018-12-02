@@ -1,11 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>EnjoyWalking</title>
-     <style>
-
-         .name{
+.name{
   text-align: center;
   font-size: 180px;
   color: rgb(0, 250, 0);
@@ -17,8 +10,7 @@
   color: rgb(200, 100, 50);
 }
 .main_body{
-    {% load static %}
-  background-image: url("{% static "start_page/setwalls.ru-4457.jpg" %}");
+  background-image: url("../media/setwalls.ru-4457.jpg");
 }
 .main_information{
     margin: auto;
@@ -108,30 +100,3 @@ a:hover {
   font-size: 30px;
   font-family: Georgia;
 }
-
-     </style>
-
-</head>
-<body class="main_body">
-<div class="name">Enjoy<span class="othercolor">Walking</span></div>
-<table>
-  <tr>
-      <th><a href="add.html">Добавить место</a></th>
-      <th><a>Ближайшие места</a></th>
-      <th><a>Настройки</a></th>
-      <th><a>Контакты</a></th>
-  </tr>
-</table>
-  <div class="main_information">
-{#    <div id="tite">Введите координаты:</div>#}
-{#    <p>Старт: <input placeholder=" ширина" class="in" type="text"> <input placeholder=" долгота" class="in" type="text" font-size="30px"></p>#}
-{#    <p>Финиш: <input class="in" type="text"> <input class="in" type="text" font-size="30px"></p>#}
-
-<form action="" method="post">
-    {% csrf_token %}
-{#    {{ form.as_p}}#}
-     {{ form.as_p}}
-    <p><input id="butt" type="submit" value="Составить маршрут"></p>
-  </div>
-</body>
-</html>
